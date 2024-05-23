@@ -13,11 +13,11 @@
 - room database
 
 ## Feature
-# 1. List Note
+### 1. List Note
    
    <img src="https://github.com/obid12/Test-Taldio/assets/62390995/63f88385-2969-49b5-816e-292e9f09164e"/>
 
-# 2. Reminder Timer
+### 2. Reminder Timer
 
    ![image](https://github.com/obid12/Test-Taldio/assets/62390995/7f9da34b-b68d-4fa7-847f-6cc0669d77a5)
 
