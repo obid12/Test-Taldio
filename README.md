@@ -14,5 +14,5 @@
 
 ## Feature
 1. List Note
-   * screenshot
+   
    <img src="https://github.com/obid12/Test-Taldio/assets/62390995/63f88385-2969-49b5-816e-292e9f09164e"/>
