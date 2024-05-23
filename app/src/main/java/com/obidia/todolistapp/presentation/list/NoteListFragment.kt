@@ -23,6 +23,8 @@ import com.obidia.todolistapp.presentation.broadcastreceiver.AlarmReceiver
 import com.obidia.todolistapp.presentation.detail.NoteDetailFragment
 import com.obidia.todolistapp.presentation.list.adapter.NoteListAdapter
 import com.obidia.todolistapp.presentation.list.adapter.NoteListFinishAdapter
+import com.obidia.todolistapp.presentation.list.viewholder.NoteListViewHolder
+import com.obidia.todolistapp.utils.ShimmerAdapter
 import com.obidia.todolistapp.utils.error
 import com.obidia.todolistapp.utils.loading
 import com.obidia.todolistapp.utils.replaceIfNull
@@ -50,10 +52,20 @@ class NoteListFragment : Fragment() {
         setupObserver()
         setupRecycleView()
         setFloatButton()
-        setSwipeNoteItem()
+        binding.rvListNote.setSwipeNoteItem(noteListAdapter)
+        binding.rvListNoteFinish.setSwipeNoteItem(noteListFinishAdapter)
         setupToolBar()
+        setupShimmerAdapter()
 
         return binding.root
+    }
+
+    private fun setupShimmerAdapter() {
+        val adapter = ShimmerAdapter(R.layout.shimmer_item_note, 10)
+        binding.rvShimmer.let {
+            it.layoutManager = LinearLayoutManager(requireContext())
+            it.adapter = adapter
+        }
     }
 
     private fun setupToolBar() {
@@ -73,9 +85,17 @@ class NoteListFragment : Fragment() {
     private fun setupObserver() {
         lifecycleScope.launch {
             viewModel.getAllNote(false).flowWithLifecycle(lifecycle).catch { }.collect { state ->
-                state.loading { }
+                state.loading {
+                    showContent(SHOW_SHIMMER)
+                }
                 state.success {
+                    showContent(SHOW_CONTENT)
                     setupAdapter(it)
+                    binding.run {
+                        rvListNote.visible(it.isNotEmpty())
+                        tvEmptyList.visible(it.isEmpty())
+                        divider.visible(it.isEmpty())
+                    }
                 }
                 state.error { }
             }
@@ -213,7 +233,9 @@ class NoteListFragment : Fragment() {
         }
     }
 
-    private fun setSwipeNoteItem() {
+    private fun RecyclerView.setSwipeNoteItem(
+        adapter: androidx.recyclerview.widget.ListAdapter<NoteModel, NoteListViewHolder>
+    ) {
         val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
@@ -228,9 +250,11 @@ class NoteListFragment : Fragment() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                val note = noteListAdapter.currentList[position]
+                val note = adapter.currentList[position]
                 viewModel.deleteNote(note)
                 alarmReceiver.cancelAlarm(requireContext(), note.id)
+
+                if (this@setSwipeNoteItem == binding.rvListNoteFinish) return
                 Snackbar.make(view!!, "Successfully deleted Note", Snackbar.LENGTH_LONG).apply {
                     setAction("Undo") {
                         viewModel.addNote(note)
@@ -249,7 +273,16 @@ class NoteListFragment : Fragment() {
         }
 
         ItemTouchHelper(itemTouchHelperCallback).apply {
-            attachToRecyclerView(binding.rvListNote)
+            attachToRecyclerView(this@setSwipeNoteItem)
         }
+    }
+
+    private fun showContent(index: Int) {
+        binding.listAnimator.displayedChild = index
+    }
+
+    companion object {
+        const val SHOW_SHIMMER = 0
+        const val SHOW_CONTENT = 1
     }
 }

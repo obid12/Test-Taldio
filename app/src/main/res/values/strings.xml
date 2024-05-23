@@ -3,9 +3,11 @@
 
     <string name="detail.input_text_title_hint">Type your Activity</string>
     <string name="detail.message_alarm_manager" formatted="false">Sekarang waktu mengerjakan Aktivitas %s</string>
+    <string name="detail.title_empty_list">There is no Activity in your search</string>
 
     <string name="list.text_toolbar">Note List</string>
     <string name="list_title_complete" formatted="false">%s Activity Complete</string>
+    <string name="list.title_empty_list">There is no on going Activity</string>
 
     <string name="alarm.notification_text">Don\'t lose your Activity 🚀</string>
 </resources>

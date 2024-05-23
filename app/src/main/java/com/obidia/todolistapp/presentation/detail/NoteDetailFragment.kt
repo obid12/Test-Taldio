@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.transition.TransitionInflater
 import com.obidia.todolistapp.BuildConfig
 import com.obidia.todolistapp.R
 import com.obidia.todolistapp.databinding.FragmentNoteDetailBinding
@@ -64,11 +65,18 @@ class NoteDetailFragment : Fragment(), DatePickerFragment.DialogDateListener,
     ): View {
         binding = FragmentNoteDetailBinding.inflate(layoutInflater, container, false)
 
+        setupAnimation()
         setupPermission()
         setupToolBar()
         loadArguments()
         setupView()
         return binding.root
+    }
+
+    private fun setupAnimation() {
+        sharedElementEnterTransition =
+            TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
+        binding.container.transitionName = BuildConfig.APPLICATION_ID
     }
 
     private fun setupToolBar() {

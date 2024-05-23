@@ -11,7 +11,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -26,11 +25,14 @@ import com.obidia.todolistapp.R
 import com.obidia.todolistapp.databinding.FragmentSearchNoteBinding
 import com.obidia.todolistapp.databinding.ItemNoteBinding
 import com.obidia.todolistapp.domain.model.NoteModel
+import com.obidia.todolistapp.presentation.broadcastreceiver.AlarmReceiver
 import com.obidia.todolistapp.presentation.detail.NoteDetailFragment
 import com.obidia.todolistapp.presentation.list.adapter.NoteListAdapter
+import com.obidia.todolistapp.utils.ShimmerAdapter
 import com.obidia.todolistapp.utils.error
 import com.obidia.todolistapp.utils.loading
 import com.obidia.todolistapp.utils.success
+import com.obidia.todolistapp.utils.visible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -40,6 +42,8 @@ class SearchNoteFragment : Fragment() {
     private lateinit var binding: FragmentSearchNoteBinding
     private val viewModel: SearchNoteViewModel by viewModels()
     private var adapter: NoteListAdapter = NoteListAdapter()
+    private var lisDeleteNote: MutableList<NoteModel> = mutableListOf()
+    private val alarmReceiver: AlarmReceiver = AlarmReceiver()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,7 +53,16 @@ class SearchNoteFragment : Fragment() {
         setupToolBar()
         setupSearch()
         setupRecycleView()
+        setupShimmerAdapter()
         return binding.root
+    }
+
+    private fun setupShimmerAdapter() {
+        val adapter = ShimmerAdapter(R.layout.shimmer_item_note, 10)
+        binding.rvShimmer.let {
+            it.layoutManager = LinearLayoutManager(requireContext())
+            it.adapter = adapter
+        }
     }
 
     private fun setupToolBar() {
@@ -71,7 +84,7 @@ class SearchNoteFragment : Fragment() {
                         hideKeyboard()
                     }
                     observer(tilSearch.editText?.text.toString())
-                    binding.swipeRefresh.isVisible = true
+                    binding.listSearchAnimator.visible(true)
                 }
                 false
             }
@@ -84,8 +97,16 @@ class SearchNoteFragment : Fragment() {
                 .flowWithLifecycle(lifecycle)
                 .catch { }
                 .collect { state ->
-                    state.loading { }
+                    state.loading {
+                        showContent(SHOW_SIMMER)
+                    }
                     state.success {
+                        if (it.isEmpty()) {
+                            showContent(SHOW_EMPTY)
+                            return@success
+                        }
+
+                        showContent(SHOW_CONTENT)
                         setupAdapter(it)
                     }
                     state.error { }
@@ -99,8 +120,35 @@ class SearchNoteFragment : Fragment() {
             it.setOnClickItem { data, binding ->
                 goToDetailNote(data, binding)
             }
-            it.setOnCheckBoxListener { item, _ ->
+            it.setOnCheckBoxListener { item, position ->
                 item?.let { data -> viewModel.updateNote(data) }
+                it.updateItem(position)
+            }
+            it.setOnLongClickIte { data, isChecked ->
+                if (!isChecked) {
+                    lisDeleteNote.remove(data)
+                    setIvDelete()
+                    return@setOnLongClickIte
+                }
+
+                lisDeleteNote.add(data)
+                setIvDelete()
+            }
+        }
+    }
+
+    private fun setIvDelete() {
+        binding.floatBtn.run {
+            visible(lisDeleteNote.isNotEmpty())
+            setOnClickListener {
+                val listDeleteRoom: ArrayList<NoteModel> = arrayListOf()
+                listDeleteRoom.addAll(lisDeleteNote)
+                viewModel.deleteListNote(listDeleteRoom)
+                listDeleteRoom.forEach {
+                    alarmReceiver.cancelAlarm(requireContext(), it.id)
+                }
+                lisDeleteNote.clear()
+                this.visible(false)
             }
         }
     }
@@ -123,7 +171,7 @@ class SearchNoteFragment : Fragment() {
         )
 
         findNavController().navigate(
-            resId = R.id.action_noteListFragment_to_noteDetailFragment,
+            resId = R.id.action_searchNoteFragment_to_noteDetailFragment,
             args = bundle,
             navOptions = null,
             extras
@@ -178,10 +226,20 @@ class SearchNoteFragment : Fragment() {
     }
 
     private fun onIconDeleteClickListener(textInputLayout: TextInputLayout) {
-        binding.swipeRefresh.isGone = true
+        binding.listSearchAnimator.visible(false)
         textInputLayout.run {
             editText?.setText("")
             requestFocus()
         }
+    }
+
+    private fun showContent(index: Int) {
+        binding.listSearchAnimator.displayedChild = index
+    }
+
+    companion object {
+        const val SHOW_SIMMER = 0
+        const val SHOW_CONTENT = 1
+        const val SHOW_EMPTY = 2
     }
 }

@@ -3,16 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_search"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
-        android:layout_marginTop="@dimen/spacing_normal"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_small"
+        android:layout_marginTop="@dimen/spacing_normal"
         android:layout_marginEnd="@dimen/spacing_24"
         android:hint="Masukan"
         android:textColorHint="@color/neutral_80"
@@ -24,8 +23,7 @@
         app:boxStrokeColor="@color/neutral_80"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/icon_back"
-        app:layout_constraintTop_toTopOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_search"
@@ -38,8 +36,7 @@
             android:paddingHorizontal="10dp"
             android:textColor="@color/neutral_80"
             android:textColorHint="@color/neutral_80"
-            android:textSize="@dimen/font_small"
-            />
+            android:textSize="@dimen/font_small" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -58,8 +55,7 @@
         app:layout_constraintTop_toTopOf="@+id/til_search"
         app:tint="@color/neutral_80"
         tools:ignore="ContentDescription"
-        tools:visibility="visible"
-        />
+        tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/icon_back"
@@ -74,8 +70,7 @@
         app:layout_constraintTop_toTopOf="@+id/til_search"
         app:tint="@color/neutral_80"
         tools:ignore="ContentDescription"
-        tools:visibility="visible"
-        />
+        tools:visibility="visible" />
 
     <View
         android:id="@+id/view"
@@ -85,28 +80,45 @@
         android:background="@color/neutral_30"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/til_search"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/til_search" />
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:visibility="gone"
-        android:id="@+id/swipe_refresh"
+    <ViewAnimator
+        android:id="@+id/list_search_animator"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/spacing_0"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view"
-        >
+        tools:visibility="visible">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_shimmer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/shimmer_item_note" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_search"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/item_note"
-            />
+            tools:listitem="@layout/item_note" />
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        <include layout="@layout/empty_layout" />
 
+    </ViewAnimator>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="44dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_delete"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,8 +14,10 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.obidia.todolistapp.BuildConfig
+import com.obidia.todolistapp.MainActivity
 import com.obidia.todolistapp.R
 import com.obidia.todolistapp.presentation.detail.NoteDetailFragment
+import com.obidia.todolistapp.presentation.list.NoteListFragment
 import com.obidia.todolistapp.utils.replaceIfNull
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -96,11 +98,20 @@ class AlarmReceiver : BroadcastReceiver() {
         message: String,
         id: Int
     ) {
+        val intent = Intent(context, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
         val channelId = "Channel_1"
         val channelName = "AlarmManager channel"
 
         val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val builder = NotificationCompat.Builder(context, channelId)
+            .setContentIntent(pendingIntent)
             .setSmallIcon(R.drawable.ic_time)
             .setContentTitle(context.getString(R.string.alarm_notification_text))
             .setContentText(message)

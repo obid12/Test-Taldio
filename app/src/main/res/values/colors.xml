@@ -10,4 +10,8 @@
     <color name="neutral_60">#999999</color>
     <color name="neutral_70">#666666</color>
     <color name="neutral_80">#333333</color>
+
+    <color name="grey">#cfd8dc</color>
 </resources>
+
+

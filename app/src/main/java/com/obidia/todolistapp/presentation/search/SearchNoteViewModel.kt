@@ -23,4 +23,10 @@ class SearchNoteViewModel @Inject constructor(
             useCase.updateNote(data)
         }
     }
+
+    fun deleteListNote(list: ArrayList<NoteModel>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            useCase.deleteListNote(list)
+        }
+    }
 }

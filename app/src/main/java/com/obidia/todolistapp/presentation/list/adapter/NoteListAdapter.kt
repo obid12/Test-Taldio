@@ -1,5 +1,6 @@
 package com.obidia.todolistapp.presentation.list.adapter
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -26,6 +27,10 @@ class NoteListAdapter : ListAdapter<NoteModel, NoteListViewHolder>(DiffCallBack)
 
     fun setOnLongClickIte(listener: ((data: NoteModel, isChecked: Boolean) -> Unit)?) {
         onLongClickItem = listener
+    }
+
+    fun updateItem(position: Int) {
+        notifyItemChanged(position, Paint.STRIKE_THRU_TEXT_FLAG)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteListViewHolder {

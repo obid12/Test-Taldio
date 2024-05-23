@@ -29,5 +29,9 @@
     <fragment
         android:id="@+id/searchNoteFragment"
         android:name="com.obidia.todolistapp.presentation.search.SearchNoteFragment"
-        android:label="SearchNoteFragment" />
+        android:label="SearchNoteFragment" >
+        <action
+            android:id="@+id/action_searchNoteFragment_to_noteDetailFragment"
+            app:destination="@id/noteDetailFragment" />
+    </fragment>
 </navigation>
