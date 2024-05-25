@@ -9,7 +9,7 @@
 - Clean architecture (to sparate presentation, domain and data layer)
 - Reactive programming: using Coroutine Flow
 - Dependency injection: Dagger Hilt
-- view binding
+- data binding
 - room database
 
 ## Feature
